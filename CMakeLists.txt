@@ -2,37 +2,34 @@
 # refer to the root source directory of the project as ${HELLO_SOURCE_DIR} and
 # to the root binary directory of the project as ${HELLO_BINARY_DIR}.
 cmake_minimum_required (VERSION 2.6)
-project (brokerZMQ)
+project (ZMQServer)
 
 #---- Enable C++14 ---- ////////////////
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-SET ( SOURCES
-  brokerZMQ.cpp
+find_package(GTest)
+
+include_directories(
+  include
+  include/3rdparty
+  include/queries
 )
 
-SET (SOURCES_worker
-  workerZMQ.cpp
-)
+file(GLOB_RECURSE SRC_${PROJECT_NAME} src/*.cpp)
+add_library(${PROJECT_NAME} ${SRC_${PROJECT_NAME}})
+target_link_libraries(${PROJECT_NAME} -lzmq)
 
-SET (SOURCES_client
-  clientZMQ.cpp
-)
+add_executable(${PROJECT_NAME}_broker src/brokerZMQ.cpp)
+add_executable(${PROJECT_NAME}_client src/clientZMQ.cpp)
 
-# Headers set
-SET ( HEADERS
-  zhelpers.hpp
-)
+target_link_libraries(${PROJECT_NAME}_broker -lzmq)
+target_link_libraries(${PROJECT_NAME}_client -lzmq)
 
-SET( LIBS ${LIBS} -lzmq )
-
-ADD_EXECUTABLE( brokerZMQ  ${SOURCES} )
-TARGET_LINK_LIBRARIES( brokerZMQ ${LIBS} )
-
-ADD_EXECUTABLE( workerZMQ  ${SOURCES_worker} )
-TARGET_LINK_LIBRARIES( workerZMQ ${LIBS} )
-
-ADD_EXECUTABLE( clientZMQ  ${SOURCES_client} )
-TARGET_LINK_LIBRARIES( clientZMQ ${LIBS} )
-
+if(GTEST_FOUND)
+  enable_testing()
+  INCLUDE_DIRECTORIES(tests)
+  FILE(GLOB_RECURSE TEST tests/*.cpp)
+  ADD_EXECUTABLE(${PROJECT_NAME}Test ${TEST}) 
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME}Test GTest::GTest GTest::Main)
+endif()
