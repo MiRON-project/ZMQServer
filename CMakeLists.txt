@@ -1,7 +1,7 @@
 # CMakeLists files in this project can
 # refer to the root source directory of the project as ${HELLO_SOURCE_DIR} and
 # to the root binary directory of the project as ${HELLO_BINARY_DIR}.
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8)
 project (ZMQServer)
 
 #---- Enable C++14 ---- ////////////////
@@ -14,6 +14,7 @@ include_directories(
   include
   include/3rdparty
   include/queries
+  include/client
 )
 
 file(GLOB_RECURSE SRC_${PROJECT_NAME} src/*.cpp)
@@ -24,7 +25,7 @@ add_executable(${PROJECT_NAME}_broker src/brokerZMQ.cpp)
 add_executable(${PROJECT_NAME}_client src/clientZMQ.cpp)
 
 target_link_libraries(${PROJECT_NAME}_broker -lzmq)
-target_link_libraries(${PROJECT_NAME}_client -lzmq)
+target_link_libraries(${PROJECT_NAME}_client -lzmq -pthread)
 
 if(GTEST_FOUND)
   enable_testing()
