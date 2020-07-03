@@ -5,6 +5,7 @@
 #include <mutex>
 #include "variant_client.hpp"
 #include "query_client.hpp"
+#include "mironDDS_listener.hpp"
 
 using namespace zmqserver;
 
@@ -12,6 +13,7 @@ int main(int argc, char *argv[])
 {
   VariantClient variant_client;
   QueryClient query_client;
+  MironDDSListener mironListener(&query_client);
 
   while(1) {
     int type;
@@ -44,7 +46,7 @@ int main(int argc, char *argv[])
           Velocity vel(value, 0);
           ChangeVelocity vel_msg(query_client.getID(), vel);
           query_client.setMsg(std::move(vel_msg.dump()));
-          query_client.main();
+          query_client.send();
           break;
         }
         default:
@@ -57,7 +59,7 @@ int main(int argc, char *argv[])
       {
         Positions pos_msg(query_client.getID());
         query_client.setMsg(std::move(pos_msg.dump()));
-        query_client.main();
+        query_client.send();
         break;
       }
       case 3:

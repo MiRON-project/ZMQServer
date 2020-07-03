@@ -15,17 +15,28 @@ include_directories(
   include/3rdparty
   include/queries
   include/client
+  $ENV{ROQME_ROOT}/roqmeDDS/include
+  $ENV{ROQME_ROOT}/roqmeDDS/cpp/idl
+  $ENV{OSPL_HOME}/include/dcps/C++/isocpp2
+  $ENV{OSPL_HOME}/include/sys
+  $ENV{OSPL_HOME}/include
+  $ENV{OSPL_HOME}/include/dcps/C++/SACPP
 )
+
+#add_definitions(-DSUBSCRIBE_TO_ROQME_CONTEXTS)
+
+link_directories($ENV{OSPL_HOME}/lib)
+link_directories($ENV{ROQME_ROOT}/roqmeDDS/lib)
 
 file(GLOB_RECURSE SRC_${PROJECT_NAME} src/*.cpp)
 add_library(${PROJECT_NAME} ${SRC_${PROJECT_NAME}})
 target_link_libraries(${PROJECT_NAME} -lzmq)
 
 add_executable(${PROJECT_NAME}_broker src/brokerZMQ.cpp)
-add_executable(${PROJECT_NAME}_client src/clientZMQ.cpp)
+add_executable(${PROJECT_NAME}_client src/clientZMQ.cpp src/MironDDSListener.cpp)
 
 target_link_libraries(${PROJECT_NAME}_broker -lzmq)
-target_link_libraries(${PROJECT_NAME}_client -lzmq -pthread)
+target_link_libraries(${PROJECT_NAME}_client -lzmq -pthread -ldcpsgapi -ldcpsgapi -lddsdatabase -lddsos -lddskernel -ldcpsisocpp2 -lroqmedds)
 
 if(GTEST_FOUND)
   enable_testing()
