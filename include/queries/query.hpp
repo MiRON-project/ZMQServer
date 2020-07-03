@@ -1,5 +1,4 @@
-#ifndef QUERY_H
-#define QUERY_H
+#pragma once
 
 #include "json.hpp"
 
@@ -28,7 +27,4 @@ class Query
             return _json.dump(1);
         }
 };
-
 }
-
-#endif

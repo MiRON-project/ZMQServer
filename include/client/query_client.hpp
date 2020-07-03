@@ -1,6 +1,10 @@
+#pragma once
+
+#include <mutex>
+#include <zmq.hpp>
+
 class QueryClient {
   
-  std::thread thread_;
   std::mutex mutex;
   zmq::context_t context;
   zmq::socket_t requester;
@@ -20,11 +24,11 @@ class QueryClient {
     }
     
     ~QueryClient() {
-      thread_.join();
       requester.disconnect("tcp://127.0.0.1:5556");
     }
 
     void setMsg(std::string msg) {
+	    std::lock_guard<std::mutex> lck (mutex);
       request_msg = std::move(msg);
     }
 
@@ -32,7 +36,8 @@ class QueryClient {
       return uid;
     }
 
-    void main() {
+    void send() {
+      std::lock_guard<std::mutex> lck (mutex);
       zmq::message_t zmq_request_msg(request_msg.size());
       memcpy(zmq_request_msg.data(), request_msg.c_str(), request_msg.size());
       if (!requester.send(zmq_request_msg)) {
@@ -48,3 +53,4 @@ class QueryClient {
       uid++;
     }
 };
+

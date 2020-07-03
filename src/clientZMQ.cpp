@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
           Velocity vel(value, 0);
           ChangeVelocity vel_msg(query_client.getID(), vel);
           query_client.setMsg(std::move(vel_msg.dump()));
-          query_client.main();
+          query_client.send();
           break;
         }
         default:
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
       {
         Positions pos_msg(query_client.getID());
         query_client.setMsg(std::move(pos_msg.dump()));
-        query_client.main();
+        query_client.send();
         break;
       }
       case 3:
