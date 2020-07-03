@@ -5,6 +5,7 @@
 #include <mutex>
 #include "variant_client.hpp"
 #include "query_client.hpp"
+#include "mironDDS_listener.hpp"
 
 using namespace zmqserver;
 
@@ -12,6 +13,7 @@ int main(int argc, char *argv[])
 {
   VariantClient variant_client;
   QueryClient query_client;
+  MironDDSListener mironListener(&query_client);
 
   while(1) {
     int type;
