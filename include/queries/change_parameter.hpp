@@ -1,5 +1,4 @@
-#ifndef QUERY_CHANGE_PARAMETER_H
-#define QUERY_CHANGE_PARAMETER_H
+#pragma once
 
 #include "json.hpp"
 #include "query.hpp"
@@ -24,5 +23,3 @@ class ChangeParameter : public Query
 };
 
 }
-
-#endif

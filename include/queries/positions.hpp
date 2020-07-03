@@ -1,5 +1,4 @@
-#ifndef QUERY_POSITIONS_H
-#define QUERY_POSITIONS_H
+#pragma once
 
 #include "json.hpp"
 #include "query.hpp"
@@ -18,5 +17,3 @@ class Positions : public Query
 };
 
 }
-
-#endif

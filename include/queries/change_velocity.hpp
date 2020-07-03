@@ -1,5 +1,4 @@
-#ifndef QUERY_CHANGE_VELOCITY_H
-#define QUERY_CHANGE_VELOCITY_H
+#pragma once
 
 #include "json.hpp"
 #include "change_parameter.hpp"
@@ -47,5 +46,3 @@ class ChangeVelocity : public ChangeParameter<Velocity>
 };
 
 }
-
-#endif

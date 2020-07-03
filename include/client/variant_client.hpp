@@ -1,3 +1,5 @@
+#pragma once
+
 #include "zhelpers.hpp"
 #include <thread>
 #include <mutex>
