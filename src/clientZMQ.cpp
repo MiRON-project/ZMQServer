@@ -39,7 +39,6 @@ int main(int argc, char *argv[])
   while(1) {
     int type;
     int subtype;
-    double value;
 
     // Menu for choosing a query
     std::cout << "********** Main Menu **********\n";
@@ -61,10 +60,14 @@ int main(int argc, char *argv[])
         {
         case 1:
         {
+          double vmin = 0;
+          double vmax = 1000;
           std::cout << "***** Speed_change value *****\n";
-          std::cout << "speed value\n>> ";
-          std::cin >> value;
-          Velocity vel(value, 0);
+          std::cout << "vmin\n>> ";
+          std::cin >> vmin;
+          std::cout << "vmax\n>> ";
+          std::cin >> vmax;
+          Velocity vel(vmin, vmax);
           ChangeVelocity vel_msg(query_client->getID(), vel);
           query_client->setMsg(std::move(vel_msg.dump()));
           query_client->send();
