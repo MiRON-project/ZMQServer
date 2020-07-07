@@ -73,12 +73,12 @@ class DoubleContextListener : public RoqmeDDSListener<RoqmeDDSTopics::RoqmeDoubl
 class EstimateListener : public RoqmeDDSListener<RoqmeDDSTopics::RoqmeEstimate>
 {
 	public:
-		EstimateListener(QueryClient *queryClient);
-		~EstimateListener() { delete queryClient; }
+		EstimateListener(std::shared_ptr<QueryClient> queryClient);
+		~EstimateListener() = default;
 		void dataAvailable(const RoqmeDDSTopics::RoqmeEstimate &data, 
 			const dds::sub::SampleInfo &sampleInfo);
 	private:
-		QueryClient *queryClient;
+		std::shared_ptr<QueryClient> query_client_;
 
 	private:
 		void changeVelocity(double value);
@@ -91,7 +91,7 @@ class EstimateListener : public RoqmeDDSListener<RoqmeDDSTopics::RoqmeEstimate>
 class MironDDSListener
 {
 	public:
-		MironDDSListener(QueryClient *queryClient);
+		MironDDSListener(std::shared_ptr<QueryClient> queryClient);
 		~MironDDSListener() = default;
 
 private:
