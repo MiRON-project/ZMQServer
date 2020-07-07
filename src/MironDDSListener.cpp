@@ -41,7 +41,7 @@ EstimateListener::EstimateListener(std::shared_ptr<QueryClient> queryClient) :
 	query_client_(queryClient) {}
 
 void EstimateListener::changeVelocity(double value){
-	Velocity vel(value, 0);
+	Velocity vel(0, value);
 	ChangeVelocity vel_msg(query_client_->getID(), vel);
         query_client_->setMsg(std::move(vel_msg.dump()));
        	query_client_->send();
@@ -61,13 +61,13 @@ void EstimateListener::dataAvailable(const RoqmeDDSTopics::RoqmeEstimate& data,
 			changeVelocity(0); //stop the robot?
 		}		
 		else if(value <= 0.5) {
-			changeVelocity(0.5);
+			changeVelocity(500);
 		}
 		else if(value <= 0.7) {
-			changeVelocity(0.7);
+			changeVelocity(700);
 		}
 		else {
-			changeVelocity(1);
+			changeVelocity(1000);
 		}
 		
 		previousValue = value;
