@@ -25,8 +25,8 @@ using namespace zmqserver;
 int main(int argc, char *argv[])
 {
   VariantClient variant_client;
-  QueryClient query_client;
-  MironDDSListener mironListener(&query_client);
+  auto query_client = std::make_shared<QueryClient>();
+  MironDDSListener mironListener(query_client);
 
   while(1) {
     int type;
@@ -57,9 +57,9 @@ int main(int argc, char *argv[])
           std::cout << "speed value\n>> ";
           std::cin >> value;
           Velocity vel(value, 0);
-          ChangeVelocity vel_msg(query_client.getID(), vel);
-          query_client.setMsg(std::move(vel_msg.dump()));
-          query_client.send();
+          ChangeVelocity vel_msg(query_client->getID(), vel);
+          query_client->setMsg(std::move(vel_msg.dump()));
+          query_client->send();
           break;
         }
         default:
@@ -70,9 +70,9 @@ int main(int argc, char *argv[])
       }
       case 2:
       {
-        Positions pos_msg(query_client.getID());
-        query_client.setMsg(std::move(pos_msg.dump()));
-        query_client.send();
+        Positions pos_msg(query_client->getID());
+        query_client->setMsg(std::move(pos_msg.dump()));
+        query_client->send();
         break;
       }
       case 3:

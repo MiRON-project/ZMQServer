@@ -14,7 +14,7 @@
 
 using namespace zmqserver;
 
-MironDDSListener::MironDDSListener(QueryClient* queryClient){
+MironDDSListener::MironDDSListener(std::shared_ptr<QueryClient> queryClient){
 #ifdef SUBSCRIBE_TO_ROQME_CONTEXTS
 	intReaderPtr = std::unique_ptr<RoqmeIntReader> (new RoqmeIntReader(new IntContextListener));
 	uintReaderPtr = std::unique_ptr<RoqmeUIntReader> (new RoqmeUIntReader(new UIntContextListener));
@@ -29,15 +29,14 @@ MironDDSListener::MironDDSListener(QueryClient* queryClient){
 /* 
  * Roqme estimate listener implementation
  */
-EstimateListener::EstimateListener(QueryClient* queryClient){
-	this->queryClient = queryClient;
-}
+EstimateListener::EstimateListener(std::shared_ptr<QueryClient> queryClient) :
+	query_client_(queryClient) {}
 
 void EstimateListener::changeVelocity(double value){
 	Velocity vel(value, 0);
-	ChangeVelocity vel_msg(queryClient->getID(), vel);
-        queryClient->setMsg(std::move(vel_msg.dump()));
-       	queryClient->send();
+	ChangeVelocity vel_msg(query_client_->getID(), vel);
+        query_client_->setMsg(std::move(vel_msg.dump()));
+       	query_client_->send();
 }
 
 void EstimateListener::dataAvailable(const RoqmeDDSTopics::RoqmeEstimate& data, 
@@ -73,7 +72,9 @@ void EstimateListener::dataAvailable(const RoqmeDDSTopics::RoqmeEstimate& data,
  * Roqme context listeners implementation
  */
 
-void IntContextListener::dataAvailable(const RoqmeDDSTopics::RoqmeIntContext& data, const dds::sub::SampleInfo& sampleInfo){
+void IntContextListener::dataAvailable(
+	const RoqmeDDSTopics::RoqmeIntContext& data, 
+	const dds::sub::SampleInfo& sampleInfo){
 	/* cout << "INT sample available" << endl;
 	cout << "\t name: " << data.name() << endl;
 	for(auto elem:data.value())
@@ -82,7 +83,9 @@ void IntContextListener::dataAvailable(const RoqmeDDSTopics::RoqmeIntContext& da
 	}*/
 }
 
-void UIntContextListener::dataAvailable(const RoqmeDDSTopics::RoqmeUIntContext& data, const dds::sub::SampleInfo& sampleInfo){
+void UIntContextListener::dataAvailable(
+		const RoqmeDDSTopics::RoqmeUIntContext& data, 
+		const dds::sub::SampleInfo& sampleInfo){
 	/*cout << "UINT sample available:" << endl;
 	cout << "\t name: " << data.name() << endl;
 	for(auto elem:data.value())
@@ -91,7 +94,9 @@ void UIntContextListener::dataAvailable(const RoqmeDDSTopics::RoqmeUIntContext& 
 	}*/
 }
 
-void BoolContextListener::dataAvailable(const RoqmeDDSTopics::RoqmeBoolContext& data, const dds::sub::SampleInfo& sampleInfo){
+void BoolContextListener::dataAvailable(
+		const RoqmeDDSTopics::RoqmeBoolContext& data, 
+		const dds::sub::SampleInfo& sampleInfo){
 	/*cout << "BOOL sample available:" << endl;
 	cout << "\t name: " << data.name() << endl;
 	for(auto elem:data.value())
@@ -100,7 +105,9 @@ void BoolContextListener::dataAvailable(const RoqmeDDSTopics::RoqmeBoolContext& 
 	}*/
 }
 
-void EnumContextListener::dataAvailable(const RoqmeDDSTopics::RoqmeEnumContext& data, const dds::sub::SampleInfo& sampleInfo){
+void EnumContextListener::dataAvailable(
+		const RoqmeDDSTopics::RoqmeEnumContext& data, 
+		const dds::sub::SampleInfo& sampleInfo){
 	cout << "ENUM sample available:" << endl;
 	cout << "\t name: " << data.name() << endl;
 	for(auto elem:data.value())
@@ -109,7 +116,9 @@ void EnumContextListener::dataAvailable(const RoqmeDDSTopics::RoqmeEnumContext& 
 	}
 }
 
-void EventContextListener::dataAvailable(const RoqmeDDSTopics::RoqmeEventContext& data, const dds::sub::SampleInfo& sampleInfo){
+void EventContextListener::dataAvailable(
+			const RoqmeDDSTopics::RoqmeEventContext& data, 
+			const dds::sub::SampleInfo& sampleInfo){
 	/*cout << "EVENT sample available:" << endl;
 	cout << "\t name: " << data.name() << endl;
 	for(auto elem:data.value())
@@ -118,7 +127,9 @@ void EventContextListener::dataAvailable(const RoqmeDDSTopics::RoqmeEventContext
 	}*/
 }
 
-void DoubleContextListener::dataAvailable(const RoqmeDDSTopics::RoqmeDoubleContext& data, const dds::sub::SampleInfo& sampleInfo){
+void DoubleContextListener::dataAvailable(
+		const RoqmeDDSTopics::RoqmeDoubleContext& data, 
+		const dds::sub::SampleInfo& sampleInfo) {
 	/*cout << "DOUBLE sample available:" << endl;
 	cout << "\t name: " << data.name() << endl;
 	for(auto elem:data.value())
