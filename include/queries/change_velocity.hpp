@@ -28,12 +28,11 @@ namespace zmqserver{
 struct Velocity{
     std::unordered_map<std::string, double> values;
 
-    Velocity(double vel, double omega)
+    Velocity(double vmin, double vmax)
     {
-        values.insert(std::make_pair("1", vel));
-        values.insert(std::make_pair("2", omega));
+        values.insert(std::make_pair("1", vmin));
+        values.insert(std::make_pair("2", vmax));
     }
-
     Velocity()
     {
         values.insert(std::make_pair("1", 0.0));
