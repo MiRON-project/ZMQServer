@@ -22,7 +22,8 @@
 #include "change_velocity.hpp"
 using namespace zmqserver;
 
-MironDDSListener::MironDDSListener(std::shared_ptr<QueryClient> queryClient){
+MironDDSListener::MironDDSListener(std::shared_ptr<QueryClient> queryClient,
+	std::shared_ptr<VariantClient> variantClient){
 #ifdef SUBSCRIBE_TO_ROQME_CONTEXTS
 	intReaderPtr = std::unique_ptr<RoqmeIntReader> (new RoqmeIntReader(new IntContextListener));
 	uintReaderPtr = std::unique_ptr<RoqmeUIntReader> (new RoqmeUIntReader(new UIntContextListener));
@@ -31,14 +32,17 @@ MironDDSListener::MironDDSListener(std::shared_ptr<QueryClient> queryClient){
 	enumReaderPtr = std::unique_ptr<RoqmeEnumReader> (new RoqmeEnumReader(new EnumContextListener));
 	eventReaderPtr = std::unique_ptr<RoqmeEventReader> (new RoqmeEventReader(new EventContextListener));
 #endif
-	estimateReaderPtr = std::unique_ptr<RoqmeEstimateReader> (new RoqmeEstimateReader(new EstimateListener(queryClient)));
+	estimateReaderPtr = std::unique_ptr<RoqmeEstimateReader>(
+		new RoqmeEstimateReader(new EstimateListener(queryClient, variantClient)));
 }
 
 /* 
  * Roqme estimate listener implementation
  */
-EstimateListener::EstimateListener(std::shared_ptr<QueryClient> queryClient) :
-	query_client_(queryClient) {}
+EstimateListener::EstimateListener(std::shared_ptr<QueryClient> queryClient,
+	std::shared_ptr<VariantClient> variantClient) :
+	query_client_(queryClient),
+	variant_client_(variantClient) {}
 
 void EstimateListener::changeVelocity(double value){
 	Velocity vel(0, value);
@@ -48,29 +52,24 @@ void EstimateListener::changeVelocity(double value){
 }
 
 void EstimateListener::dataAvailable(const RoqmeDDSTopics::RoqmeEstimate& data, 
-	const dds::sub::SampleInfo& sampleInfo){
+	const dds::sub::SampleInfo& sampleInfo) {
 
-	double previousValue = -1;
-	const double value = data.value();
+	double value = data.value();
 	const std::string name = data.name();
 
-	if(!name.compare("safety") && value != previousValue)
+	if(name == "safety" && value != -1)
 	{
-		//TODO: update velocity according to estimate values
-		if(value <= 0.1) {
-			changeVelocity(0); //stop the robot?
+		double sq_value = sqrt(value);
+		changeVelocity(1000 * sq_value / (sq_value + sqrt(1-value)));
+		return;
+	}
+
+	if(name == "power_autonomy" && value != -1)
+	{
+		if(value <= 0.3) {
+			variant_client_->sendVariant("one");
 		}		
-		else if(value <= 0.5) {
-			changeVelocity(500);
-		}
-		else if(value <= 0.7) {
-			changeVelocity(700);
-		}
-		else {
-			changeVelocity(1000);
-		}
-		
-		previousValue = value;
+		return;
 	}
 }
 

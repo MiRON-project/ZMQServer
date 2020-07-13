@@ -21,7 +21,8 @@
 #pragma once
 
 #include <RoqmeReaderImpl.h>
-#include "query_client.hpp"
+#include <query_client.hpp>
+#include <variant_client.hpp>
 
 using namespace Roqme;
 
@@ -80,12 +81,14 @@ class DoubleContextListener : public RoqmeDDSListener<RoqmeDDSTopics::RoqmeDoubl
 class EstimateListener : public RoqmeDDSListener<RoqmeDDSTopics::RoqmeEstimate>
 {
 	public:
-		EstimateListener(std::shared_ptr<QueryClient> queryClient);
+		EstimateListener(std::shared_ptr<QueryClient> queryClient,
+			std::shared_ptr<VariantClient> variantClient);
 		~EstimateListener() = default;
 		void dataAvailable(const RoqmeDDSTopics::RoqmeEstimate &data, 
 			const dds::sub::SampleInfo &sampleInfo);
 	private:
 		std::shared_ptr<QueryClient> query_client_;
+		std::shared_ptr<VariantClient> variant_client_;
 
 	private:
 		void changeVelocity(double value);
@@ -98,7 +101,8 @@ class EstimateListener : public RoqmeDDSListener<RoqmeDDSTopics::RoqmeEstimate>
 class MironDDSListener
 {
 	public:
-		MironDDSListener(std::shared_ptr<QueryClient> queryClient);
+		MironDDSListener(std::shared_ptr<QueryClient> queryClient,
+			std::shared_ptr<VariantClient> variantClient);
 		~MironDDSListener() = default;
 
 private:
