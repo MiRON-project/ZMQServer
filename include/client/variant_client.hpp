@@ -23,6 +23,7 @@
 #include "zhelpers.hpp"
 #include <thread>
 #include <mutex>
+#include <json.hpp>
 
 class VariantClient
 {

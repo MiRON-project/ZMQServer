@@ -32,9 +32,9 @@ using namespace zmqserver;
 
 int main(int argc, char *argv[])
 {
-  VariantClient variant_client;
+  auto variant_client = std::make_shared<VariantClient>();
   auto query_client = std::make_shared<QueryClient>();
-  MironDDSListener mironListener(query_client);
+  MironDDSListener mironListener(query_client, variant_client);
 
   while(1) {
     int type;
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
         std::cout << "New Variant Value >> ";
         std::string variant;
         std::cin >> variant;
-        variant_client.sendVariant(variant);
+        variant_client->sendVariant(variant);
         break;
       }
     }
