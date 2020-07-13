@@ -19,7 +19,7 @@ Minizinc::Minizinc(const std::string mzn_path, const std::string dzn_path)
 	std::string command;
 
 	// Checking minizinc command
-	command = "minizinc --version 2>&1 1>/dev/null";
+	command = "$MINIZINC_DIR/minizinc --version 2>&1 1>/dev/null";
 	fp = popen(command.c_str(),"r");
 
 	if (fp == NULL) {
@@ -96,7 +96,7 @@ int Minizinc::Run(const std::vector<DataPair> inputs, Solution* outputs, bool di
 
 	// Running minizinc command to execute the optimization
 	if(result == 0) {
-		command = "minizinc -b mip -G linear -D \""
+		command = "$MINIZINC_DIR/minizinc -b mip -G linear -D \""
 			+ context_str + "\" " + mzn_path_ + " " + dzn_path_
 			+ " --mzn2fzn-cmd \"mzn2fzn --output-ozn-to-file "
 			+ mzn_path_.substr(0,mzn_path_.size()-3) + "ozn --output-to-file "
