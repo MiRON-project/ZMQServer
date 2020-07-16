@@ -1,4 +1,4 @@
-#include "adaptation/minizinc.h"
+#include "adaptation/minizinc.hpp"
 #include <iostream>
 
 namespace miron {
