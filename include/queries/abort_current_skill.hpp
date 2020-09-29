@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
     Author: Renan Freitas, renan028@gmail.com
+            Antonio Bandera, ajbandera@uma.es
     Maintainer: Renan Freitas, renan028@gmail.com
 */
 
@@ -26,21 +27,38 @@
 namespace zmqserver
 {
 
-template <class T>
-class ChangeParameter : public Query
-{
-protected:
-  T _values;
+struct ApproachDist{
+  std::unordered_map<std::string, double> values;
 
-public:
-  ChangeParameter(int id, T values) : Query(id),
-                                      _values(values)
-  {
-    _query["type"] = "change-parameter";
+  ApproachDist(double dist) {
+    values.insert(std::make_pair("1", dist));
   }
-  ~ChangeParameter(){};
+  ApproachDist() {
+    values.insert(std::make_pair("1", 100));
+  }
+};
 
-  void setParameter(const T &values) { _values = values; };
+class AbortCurrentSkill : public ChangeParameter<ApproachDist>
+{
+public:
+  AbortCurrentSkill(int id, ApproachDist value) : 
+    ChangeParameter<ApproachDist>(id, value) {
+      _query["type"] = "abort-current-skill";
+      _query["ParameterSetRepository"] = "CommNavigationObjects";
+      _query["ParameterSet"] = "CdlParameter";
+      _query["Component"] = "SmartCdlServer";
+      _query["Parameter"] = "approachdist";
+  }
+  ~AbortCurrentSkill(){};
+
+  std::string dump() override
+  {
+    nlohmann::json values;
+
+    values["1"] = _values.values["1"];
+    _query["values"] = values;
+    return Query::dump();
+  }
 };
 
 } // namespace zmqserver
