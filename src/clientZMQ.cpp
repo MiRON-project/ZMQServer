@@ -26,6 +26,7 @@
 #include <mutex>
 #include "variant_client.hpp"
 #include "query_client.hpp"
+#include <abort_current_skill.hpp>
 #include "mironDDS_listener.hpp"
 
 using namespace zmqserver;
@@ -88,6 +89,10 @@ int main(int argc, char *argv[])
       }
       case 3:
       {
+        ApproachDist app_dist(100000);
+        AbortCurrentSkill abort_msg(query_client->getID(), app_dist);
+        query_client->setMsg(std::move(abort_msg.dump()));
+        query_client->send();
         break;
       }
       case 4:
