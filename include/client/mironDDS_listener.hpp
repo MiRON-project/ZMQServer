@@ -92,6 +92,7 @@ class EstimateListener : public RoqmeDDSListener<RoqmeDDSTopics::RoqmeEstimate>
 		double safety_threshold_;
 		double tmp_safety_;
 		bool flag_power_autonomy_;
+		bool flag_mission_completion_;
 
 	private:
 		void changeVelocity(double value);

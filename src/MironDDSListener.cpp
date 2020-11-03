@@ -48,7 +48,8 @@ EstimateListener::EstimateListener(std::shared_ptr<QueryClient> queryClient,
 		variant_client_(variantClient),
 		safety_threshold_(0.1),
 		tmp_safety_(-1),
-		flag_power_autonomy_(false) {}
+		flag_power_autonomy_(false),
+		flag_mission_completion_(false) {}
 
 void EstimateListener::changeVelocity(double value)
 {
@@ -89,7 +90,7 @@ void EstimateListener::dataAvailable(const RoqmeDDSTopics::RoqmeEstimate &data,
 	{
 		if (value <= 0.3)
 		{
-			variant_client_->sendVariant("one");
+			variant_client_->sendVariant("dock");
 			abortCurrentSkill(100000); 
 			flag_power_autonomy_ = 1;	 
 		}
@@ -101,6 +102,17 @@ void EstimateListener::dataAvailable(const RoqmeDDSTopics::RoqmeEstimate &data,
 		if (value > 0.3)
 		{													 
 			flag_power_autonomy_ = 0; 
+		}													 
+		return;										 
+	}
+
+	if (name == "mission_completion" && value != -1) 
+	{																																				 
+		if (value > 0.6 && !flag_mission_completion_)
+		{									
+			flag_mission_completion_ = true;				 
+			variant_client_->sendVariant("deliver");
+			abortCurrentSkill(100000); 
 		}													 
 		return;										 
 	}														 
