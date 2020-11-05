@@ -23,6 +23,7 @@
 #include <RoqmeReaderImpl.h>
 #include <query_client.hpp>
 #include <variant_client.hpp>
+#include <mutex>
 
 using namespace Roqme;
 
@@ -66,13 +67,31 @@ class EventContextListener : public RoqmeDDSListener<RoqmeDDSTopics::RoqmeEventC
 			const dds::sub::SampleInfo &sampleInfo);
 };
 
+#endif
+
+
+class DistanceToGoal
+{
+public:
+    DistanceToGoal();
+    double get();
+    void set(const double& value);
+private:
+    std::mutex lock;
+    double distance;
+};
+
 class DoubleContextListener : public RoqmeDDSListener<RoqmeDDSTopics::RoqmeDoubleContext>
 {
 	public:
+        DoubleContextListener(std::shared_ptr<DistanceToGoal>& distance);
+        
 		void dataAvailable(const RoqmeDDSTopics::RoqmeDoubleContext &data, 
 			const dds::sub::SampleInfo &sampleInfo);
+        
+    private:
+        std::shared_ptr<DistanceToGoal> distance_;
 };
-#endif
 
 /*
  * Roqme reasoner estimation listener
@@ -81,14 +100,16 @@ class DoubleContextListener : public RoqmeDDSListener<RoqmeDDSTopics::RoqmeDoubl
 class EstimateListener : public RoqmeDDSListener<RoqmeDDSTopics::RoqmeEstimate>
 {
 	public:
-		EstimateListener(std::shared_ptr<QueryClient> queryClient,
-			std::shared_ptr<VariantClient> variantClient);
+		EstimateListener(   std::shared_ptr<DistanceToGoal> distance,
+                            std::shared_ptr<QueryClient> queryClient,
+                            std::shared_ptr<VariantClient> variantClient);
 		~EstimateListener() = default;
 		void dataAvailable(const RoqmeDDSTopics::RoqmeEstimate &data, 
 			const dds::sub::SampleInfo &sampleInfo);
 	private:
 		std::shared_ptr<QueryClient> query_client_;
 		std::shared_ptr<VariantClient> variant_client_;
+        std::shared_ptr<DistanceToGoal> distance_;
 		double safety_threshold_;
 		double tmp_safety_;
 		bool flag_power_autonomy_;
@@ -113,10 +134,11 @@ private:
 #ifdef SUBSCRIBE_TO_ROQME_CONTEXTS
 	std::unique_ptr<RoqmeIntReader> intReaderPtr;
 	std::unique_ptr<RoqmeUIntReader> uintReaderPtr;
-	std::unique_ptr<RoqmeDoubleReader> doubleReaderPtr;
 	std::unique_ptr<RoqmeBoolReader> boolReaderPtr;
 	std::unique_ptr<RoqmeEnumReader> enumReaderPtr;
 	std::unique_ptr<RoqmeEventReader> eventReaderPtr;
 #endif
+    std::shared_ptr<RoqmeDoubleReader> doubleReaderPtr;
 	std::unique_ptr<RoqmeEstimateReader> estimateReaderPtr;
+    std::shared_ptr<DistanceToGoal> distance_;
 };

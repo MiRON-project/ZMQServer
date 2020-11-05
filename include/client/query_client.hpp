@@ -49,7 +49,7 @@ class QueryClient {
 
     void setMsg(std::string msg) {
 	    std::lock_guard<std::mutex> lck (mutex);
-      request_msg = std::move(msg);
+        request_msg = std::move(msg);
     }
 
     int getID() const {
